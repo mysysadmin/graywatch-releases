@@ -34,17 +34,26 @@ kernel log lines, so review it before sending it on.
 
 ## What it needs
 
-- Linux on x86_64, run as root. Without root it still runs, but loses the
-  eBPF evidence: stuck FUSE requests, kernel stacks of blocked threads and
-  which connections retransmit.
+- Linux on x86_64. Run it as root: the eBPF measurements need it, and
+  without them the report loses stuck FUSE requests, kernel stacks of
+  blocked threads, per-device queue and service times and which
+  connections retransmit.
 - For eBPF: glibc 2.35 or later, or RHEL 9 and its rebuilds, and the libelf
   library, which standard installs include. Tested on Rocky Linux 9 and
-  Ubuntu 24.04.
+  Ubuntu 22.04 and 24.04, with kernels 5.14 to 7.0.
 - PSI (pressure stall information) is optional. It is usually off on RHEL,
   Rocky and AlmaLinux; the report then simply says what is missing.
 
 It stops by itself after the collection and leaves only the report and the
 archive behind.
+
+## What the eBPF part does
+
+Graywatch only measures. It loads tracing programs that read timings and
+counters, and none of the eBPF features that can change the kernel, other
+processes or network traffic. Nothing stays loaded after the collection.
+`EBPF.txt` in each bundle lists every program, what it reads, and how to
+check it on your node with `bpftool`.
 
 ## License
 
