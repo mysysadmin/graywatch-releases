@@ -32,6 +32,28 @@ evidence behind it. Read the report with `less`, or send the archive to
 whoever helps you. The archive contains process names, mount points and
 kernel log lines, so review it before sending it on.
 
+## Run it as a service
+
+A one-off collection only sees its own minute. Installed as a service,
+Graywatch keeps watching, records what happened before anyone noticed, and
+collects by itself while a problem lasts:
+
+```sh
+sudo ./install-graywatch.sh
+```
+
+- The daemon runs unprivileged and keeps the last 30 minutes of what it
+  measures in `/var/log/graywatch`, plus a small log of problem periods: when
+  a disk, mount or resource went bad and when it recovered.
+- When a problem lasts a minute, a full collection runs as root, at most once
+  an hour, into `/var/lib/graywatch/captures` (newest 10 kept).
+- Every collection on that node then includes the recorded minutes before it,
+  and its report says when the problems began.
+
+Settings are in `/etc/default/graywatch`. `GRAYWATCH_KEEP=7d` records all the
+time instead of the last 30 minutes. `--no-capture` installs without automatic
+collections; `--uninstall` removes it and keeps the recordings.
+
 ## What it needs
 
 - Linux on x86_64. Run it as root: the eBPF measurements need it, and
